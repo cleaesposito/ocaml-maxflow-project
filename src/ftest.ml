@@ -1,5 +1,5 @@
 open Gfile
-open Tools
+(*open Tools*)
 
 let () =
 
@@ -31,8 +31,8 @@ let () =
 
   (* Rewrite the graph that has been read. *)
 
-  (*TEST CLONE_NODES*)
-  let () = write_file outfile (clone_nodes graph) in
+  (*TEST CLONE_NODES
+  let () = write_file outfile (clone_nodes graph) in*)
 
   (*TEST GMAP
   let () = write_file outfile (gmap (gmap graph int_of_string) string_of_int) in*)
@@ -43,5 +43,6 @@ let () =
   let () = write_file outfile (gmap (add_arc (gmap graph int_of_string) 0 4 8)string_of_int) in
   let () = write_file outfile (gmap (add_arc (gmap graph int_of_string) 8 6 8)string_of_int) in*)
 
+  let () = export outfile graph in
   ()
 

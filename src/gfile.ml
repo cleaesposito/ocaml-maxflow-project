@@ -112,3 +112,20 @@ let from_file path =
   close_in infile ;
   final_graph
 
+let export path graph =  (* Open a write-file. *)
+  let ff = open_out path in 
+
+  (* Write in this file. *)
+  fprintf ff "digraph create_graph {
+  fontname=\"Helvetica,Arial,sans-serif\"
+  node [fontname=\"Helvetica,Arial,sans-serif\"]
+  edge [fontname=\"Helvetica,Arial,sans-serif\"]
+  rankdir=LR;\n";
+
+  (* Write all nodes (with fake coordinates) *)
+  e_iter graph (fun arc -> fprintf ff "%d -> %d [label = %s];\n" arc.src arc.tgt arc.lbl);
+  
+  fprintf ff "}";
+
+  close_out ff ;
+

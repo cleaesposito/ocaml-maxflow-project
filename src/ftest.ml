@@ -1,5 +1,6 @@
 open Gfile
 (*open Tools*)
+open Ford
 
 let () =
 
@@ -43,6 +44,9 @@ let () =
   let () = write_file outfile (gmap (add_arc (gmap graph int_of_string) 0 4 8)string_of_int) in
   let () = write_file outfile (gmap (add_arc (gmap graph int_of_string) 8 6 8)string_of_int) in*)
 
+  (*TESTS FIND_CHEMIN*)
+  let () = Printf.printf "%s%!" (print_list_opt (find_chemin graph 0 12)) in
+    
   let () = export outfile graph in
   ()
 

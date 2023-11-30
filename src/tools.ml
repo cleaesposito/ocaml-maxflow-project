@@ -15,3 +15,4 @@ let add_arc g id1 id2 n =
   match (find_arc g id1 id2) with
     |None -> new_arc g {src = id1 ; tgt = id2 ; lbl = n}
     |Some arc -> new_arc g {arc with lbl = (arc.lbl + n)}
+

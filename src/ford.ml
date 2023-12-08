@@ -1,4 +1,5 @@
 open Graph
+open Tools
    
 let find_chemin (gr:'a graph) id1 id2 =
   let rec find_chemin_rec (g:'a graph) id1 id2 acu =
@@ -16,15 +17,32 @@ let print_list_opt = function
   |Some l -> String.concat ", " (List.map (fun a -> string_of_int a) l)
 
 
-(*let var_flot gr max = function
-  |a::b::rest -> (match (find_arc gr a b) with
-    |None -> int.max(max, var_flot (b::rest))
-    |Some x -> int.max(max,var_flot (b::rest), x.lbl)
-  |_->max
-*)
+let var_flot gr lnodes =
+  let rec vflot g min = function
+    |a::b::rest -> (match (find_arc g a b) with
+      |None -> failwith ("ERREUR : l'arc est censé exister dans le graphe")
+      |Some x -> Int.min min (vflot gr x.lbl (b::rest)))
+    |_-> min
+in vflot gr Int.max_int lnodes
 
-(*let update_graph_flot gr = function
-  |[] -> gr
-  |d::a::rest -> (*modifier l'arc qui va de d à a + idem pour a::rest*)
-  (*retourner l'arc en changeant le label et en ajoutant les arcs retours*);
-*)
+
+let update_graph_flot gr flot chemin = 
+  let rec change_arcs f lnodes g arc = 
+    match lnodes with 
+      |x::y::rest -> if (x == arc.src && y == arc.tgt) 
+                      then (if (arc.lbl - f > 0) 
+                            then (Printf.printf ("arc et non nul") ; add_arc (add_arc g arc.tgt arc.src f) arc.src arc.tgt (arc.lbl-f))
+                            else (Printf.printf ("arc et nul") ; add_arc g arc.tgt arc.src f))
+                      else change_arcs f (y::rest) g arc
+      |_->   add_arc g arc.src arc.tgt arc.lbl (*l'arc ne fait pas partie du chemin donc on le récupère tel quel*)
+    in e_fold gr (change_arcs flot chemin) (clone_nodes gr)
+
+(*tant qu'il existe un chemin dans le graphe de flots, continuer --> fonction principale de l'algo*)
+(*une fois qu'on a le graphe de flots final avec plus aucun chemin, on fait la somme des arcs sortant de la src*)
+
+(*A TESTER*)
+let debit_total gr idsrc = 
+  let rec find_debit deb = function
+    |[] -> deb
+    |a::rest -> find_debit (deb + a.lbl) rest
+in find_debit 0 (out_arcs gr idsrc)

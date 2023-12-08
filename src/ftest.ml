@@ -1,5 +1,5 @@
 open Gfile
-(*open Tools*)
+open Tools
 open Ford
 
 let () =
@@ -44,9 +44,33 @@ let () =
   let () = write_file outfile (gmap (add_arc (gmap graph int_of_string) 0 4 8)string_of_int) in
   let () = write_file outfile (gmap (add_arc (gmap graph int_of_string) 8 6 8)string_of_int) in*)
 
-  (*TESTS FIND_CHEMIN*)
-  let () = Printf.printf "%s%!" (print_list_opt (find_chemin graph 0 12)) in
+  (*TESTS FIND_CHEMIN
+  let () = Printf.printf "%s%!" (print_list_opt (find_chemin graph 0 12)) in*)
     
-  let () = export outfile graph in
+
+  (*TESTS VAR_FLOT*)
+  (*let () = 
+    match (find_chemin graph 0 6) with
+    |Some a ->  Printf.printf "%s%!\n" (print_list_opt (find_chemin graph 0 6)) ; 
+                Printf.printf "Flot du chemin trouvé : %d%!" (var_flot (gmap graph int_of_string) a)
+    |None -> Printf.printf "Pas de chemin trouvé %!"
+  in*)  
+  
+(*TESTS UPDATE_GRAPHE_FLOTS*)
+  let () = 
+      let gr = (gmap graph int_of_string) in
+        let c = find_chemin gr 9 12 in
+        match c with
+        |Some a ->  Printf.printf "%s%!\n" (print_list_opt (c)) ; 
+                    (let f = var_flot gr a in
+                    Printf.printf "Flot du chemin trouvé : %d%!" f;
+                    let g = gmap (update_graph_flot gr f a) string_of_int in
+                      write_file outfile g ;
+                      export (outfile ^ ".dot") g) 
+        |None -> Printf.printf "Pas de chemin trouvé %!"
+  in
+
+
+  (*let () = export outfile graph in*)
   ()
 

@@ -1,6 +1,7 @@
-open Gfile
+(*open Gfile
 open Tools
-open Ford
+open Ford*)
+open Sfile
 
 let () =
 
@@ -20,7 +21,7 @@ let () =
   (* Arguments are : infile(1) source-id(2) sink-id(3) outfile(4) *)
 
   let infile = Sys.argv.(1)
-  and outfile = Sys.argv.(4)
+  (*and outfile = Sys.argv.(4)*)
 
   (* These command-line arguments are not used for the moment. *)
   and _source = int_of_string Sys.argv.(2)
@@ -28,7 +29,10 @@ let () =
   in
 
   (* Open file *)
-  let graph = from_file infile in
+  (*let graph = from_file infile in*)
+  let sports = assosports_from_file infile in 
+    let f (p, spl) = "[" ^p ^" : "^ (list2s ", " (fun x -> x) spl)^"]" in
+      Printf.printf "Liste d'associations : %s\n%!" (list2s ", " f sports)
 
   (* Rewrite the graph that has been read. *)
 
@@ -57,7 +61,7 @@ let () =
   in*)  
   
 (*TESTS UPDATE_GRAPHE_FLOTS*)
-  let () = 
+  (*let () = 
       let gr = (gmap graph int_of_string) in
         let c = find_chemin gr 9 12 in
         match c with
@@ -69,8 +73,18 @@ let () =
                       export (outfile ^ ".dot") g) 
         |None -> Printf.printf "Pas de chemin trouvé %!"
   in
+*)
 
+(* TEST FORD_FULKERSON & DEBIT_TOTAL*)
+(*let () = 
+  let gr = gmap (ford_fulkerson (gmap graph int_of_string) 0 7) string_of_int in 
+    write_file outfile gr ; export (outfile ^ ".dot") gr ; Printf.printf "Débit total = %d\n%!" (debit_total (gmap gr int_of_string) 7) in
+*)
 
   (*let () = export outfile graph in*)
-  ()
+
+
+
+
+
 

@@ -2,7 +2,7 @@
 
 src?=0
 dst?=5
-graph?=graph2.txt
+graph?=assosports1.txt
 
 all: build
 

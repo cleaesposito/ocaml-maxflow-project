@@ -1,6 +1,6 @@
-open Gfile
+(*open Gfile
 open Tools
-(*open Ford*)
+open Ford*)
 open Sfile
 
 let () =
@@ -21,7 +21,7 @@ let () =
   (* Arguments are : infile(1) source-id(2) sink-id(3) outfile(4) *)
 
   let infile = Sys.argv.(1)
-  and outfile = Sys.argv.(4)
+  (*and outfile = Sys.argv.(4)*)
 
   (* These command-line arguments are not used for the moment. *)
   and _source = int_of_string Sys.argv.(2)
@@ -33,16 +33,6 @@ let () =
   (*let sports = assosports_from_file infile in 
     let f (p, spl) = "[" ^p ^" : "^ (list2s ", " (fun x -> x) spl)^"]" in
       Printf.printf "Liste d'associations : %s\n%!" (list2s ", " f sports)*)
-
-  (*Test CREATE_NODES*)
-  (*let nodes = create_nodes (assosports_from_file infile) in 
-    Printf.printf "Liste de nodes : %s\n%!" (list2s ", " (fun a -> a) nodes)
-*)
-  (*TEST CREATE_GR*)
-  let gr = create_gr (assosports_from_file infile) (create_nodes (assosports_from_file infile)) in
-    write_file outfile (gmap gr string_of_int) ;
-
-
 
   (* Rewrite the graph that has been read. *)
 
@@ -70,8 +60,8 @@ let () =
     |None -> Printf.printf "Pas de chemin trouvé %!"
   in*)  
   
-(*TESTS UPDATE_GRAPHE_FLOTS*)
-  (*let () = 
+(*TESTS UPDATE_GRAPHE_FLOTS
+  let () = 
       let gr = (gmap graph int_of_string) in
         let c = find_chemin gr 9 12 in
         match c with
@@ -85,8 +75,8 @@ let () =
   in
 *)
 
-(* TEST FORD_FULKERSON & DEBIT_TOTAL*)
-(*let () = 
+(* TEST FORD_FULKERSON & DEBIT_TOTAL
+let () = 
   let gr = gmap (ford_fulkerson (gmap graph int_of_string) 0 7) string_of_int in 
     write_file outfile gr ; export (outfile ^ ".dot") gr ; Printf.printf "Débit total = %d\n%!" (debit_total (gmap gr int_of_string) 7) in
 *)
@@ -94,6 +84,33 @@ let () =
   (*let () = export outfile graph in*)
 
 
+(******************************************************)
+(*PROJET SPORTS*)
+
+(*TEST CREATE_NODES
+let nodes = create_nodes (assosports_from_file infile) in 
+  Printf.printf "Liste de nodes : %s\n%!" (list2s ", " (fun a -> a) nodes)*)
+
+(*TEST CREATE_GRAPH
+let gr = create_graph (assosports_from_file infile)
+  in (write_file outfile (gmap gr string_of_int) ; export (outfile ^ ".dot") (gmap gr string_of_int))*)
+
+(*TEST FORD_SPORTS
+let gr = ford_sports (create_graph (assosports_from_file infile)) 
+  in (write_file outfile (gmap gr string_of_int) ; export (outfile ^ ".dot") (gmap gr string_of_int))*)
+
+
+(*TEST SOLUTION*)
+let gr = solution (assosports_from_file infile) in
+let f (p,s) = "["^p^" : "^s^"]" in  
+  Printf.printf "\n******************************ATTRIBUTION DES SPORTS****************************** \n%s\n%!" (list2s "\n" f gr)
+
+
+
+(*TODO : 
+  - reprendre les tests
+  - passer le nombre de sports associés à chaque personne et le nombre de personnes max par sport en paramètres
+  - commenter le code*)
 
 
 

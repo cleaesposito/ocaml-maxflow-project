@@ -1,4 +1,5 @@
 open Graph
+open Ford
 
 let read_sports sports line =
   try Scanf.sscanf line "%s %s@;" (fun nom s -> (nom, (String.split_on_char ' ' s))::sports)
@@ -39,8 +40,7 @@ let assosports_from_file path =
 let list2s sep f l =
   String.concat sep (List.map f l)
 
-
-let create_nodes l = 
+let create_lnodes l = 
   let fct nodelist (people, lsports) =
     if List.mem people nodelist then nodelist else
       let fct2 lnodes sport =
@@ -55,28 +55,61 @@ let index elem liste =
     |[] -> failwith ("ERREUR : le node est censé exister") 
   in loop 1 elem liste
 
-let create_arc_people node lassoc lnodes = 
+let add_nodes lnodes = 
+  let init_node = 
+    new_node (new_node empty_graph 0) ((List.length lnodes)+1)
+  and fct gr node = new_node gr (index node lnodes)
+  in List.fold_left fct init_node lnodes
+  
+let add_people_arcs node lassoc lnodes gr = 
   let rec lsports l = 
-    match l with
+    match l with (*Pour récupérer la liste de sports associée à node*)
     |(x,y)::rest -> if (x = node) then y else lsports rest
     |[] -> failwith "Le node est censé exister"
-  and fct alist sport =
-    {src = index node lnodes; tgt = index sport lnodes; lbl = 1}::alist
+  and fct g sport =
+    new_arc g {src = index node lnodes; tgt = index sport lnodes; lbl = 1} (*1 = nb de sports à associer à chaque personne*)
 
-    in List.fold_left fct [] (lsports lassoc)
-
-let create_arc_init lassoc lnodes = 
-  let loop alist node = 
-    if List.mem_assoc node lassoc 
-      then {src = 0; tgt = index node lnodes; lbl = 1}::alist
-      else alist
-  in List.fold_left loop [] lnodes
+    in List.fold_left fct gr (lsports lassoc)
 
 
-  let create_gr lassoc lnodes =
-    let fct n gr node = 
-      if List.mem_assoc node lassoc
-        then (index node lnodes,create_arc_people node lassoc lnodes)::gr
-        else (index node lnodes, [{src = (index node lnodes); tgt = n; lbl = 2}])::gr (*2 = nb de personnes acceptées par sport*)
+let add_arcs lassoc lnodes gr =
+  let fct g node =
+    if List.mem_assoc node lassoc
+      then add_people_arcs node lassoc lnodes (new_arc g {src = 0; tgt = (index node lnodes); lbl = 1}) (*1 = nb de personnes acceptées par sport*)
+      else new_arc g {src = (index node lnodes); tgt = ((List.length lnodes)+1); lbl = 1} (*1 = nb de personnes acceptées par sport*)
+    in List.fold_left fct gr lnodes
 
-    in List.fold_left (fct ((List.length lnodes)+1)) [(((List.length lnodes)+1),[]);(0,create_arc_init lassoc lnodes)] lnodes
+let create_graph lassoc = 
+  let lnodes = create_lnodes lassoc in
+  add_arcs lassoc lnodes (add_nodes lnodes)
+
+
+let ford_sports gr =
+  let length acu n = 
+    if n > acu then n else acu
+  in ford_fulkerson gr 0 (n_fold gr length 0)
+
+let get_element ind l =
+  let rec loop n = function
+    |x::rest -> if (n=ind) then x else loop (n+1) rest
+    |[] -> failwith "L'élément est censé exister dans la liste"
+  in loop 1 l
+
+let graph2assoc gr lassoc lnodes =
+
+  let fct asl node = 
+    if List.mem_assoc node lassoc then asl 
+    else 
+
+      let fct2 assoclist arc = 
+      if (arc.tgt = ((List.length lnodes)+1)) then assoclist 
+      else (get_element arc.tgt lnodes, node)::assoclist
+    
+    in List.fold_left fct2 asl (out_arcs gr (index node lnodes)) 
+
+
+  in List.fold_left fct [] lnodes
+
+let solution lassoc = 
+  let lnodes = create_lnodes lassoc in
+  graph2assoc (ford_sports (create_graph lassoc)) lassoc lnodes

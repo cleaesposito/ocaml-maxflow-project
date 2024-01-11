@@ -1,6 +1,7 @@
 open Graph
 open Ford
 
+(* lis une ligne du fichier *)
 let read_sports sports line =
   try Scanf.sscanf line "%s %s@;" (fun nom s -> (nom, (String.split_on_char ' ' s))::sports)
   with e ->
@@ -8,6 +9,7 @@ let read_sports sports line =
     failwith "from_file" 
 
 
+(* pour créer une liste d'associations du type : (personne,[sport1, sport2, ...]) *)
 let assosports_from_file path = 
   let infile = open_in path in
 
@@ -37,17 +39,20 @@ let assosports_from_file path =
   final_sports
 
 
+(* pour afficher une liste *)
 let list2s sep f l =
   String.concat sep (List.map f l)
 
+(* créer une liste de toutes les nodes : personnes + sports *)
 let create_lnodes l = 
-  let fct nodelist (people, lsports) =
+  let for_people nodelist (people, lsports) =
     if List.mem people nodelist then nodelist else
-      let fct2 lnodes sport =
+      let for_sports lnodes sport =
         if List.mem sport lnodes then lnodes else sport::lnodes
-      in List.fold_left fct2 (people::nodelist) lsports
-  in List.fold_left fct [] l
+      in List.fold_left for_sports (people::nodelist) lsports
+  in List.fold_left for_people [] l
 
+(* retourne l'index d'un élément dans une liste *)
 let index elem liste = 
   let rec loop n e l = 
     match l with
@@ -55,61 +60,62 @@ let index elem liste =
     |[] -> failwith ("ERREUR : le node est censé exister") 
   in loop 1 elem liste
 
+(* ajoute une node au graph *)
 let add_nodes lnodes = 
   let init_node = 
     new_node (new_node empty_graph 0) ((List.length lnodes)+1)
-  and fct gr node = new_node gr (index node lnodes)
-  in List.fold_left fct init_node lnodes
-  
+  and add gr node = new_node gr (index node lnodes)
+  in List.fold_left add init_node lnodes
+
+(* ajoute les arcs entre une personne (node) et ses sports *)
 let add_people_arcs node lassoc lnodes gr = 
   let rec lsports l = 
     match l with (*Pour récupérer la liste de sports associée à node*)
     |(x,y)::rest -> if (x = node) then y else lsports rest
     |[] -> failwith "Le node est censé exister"
-  and fct g sport =
+  and add g sport =
     new_arc g {src = index node lnodes; tgt = index sport lnodes; lbl = 1} (*1 = nb de sports à associer à chaque personne*)
+    in List.fold_left add gr (lsports lassoc)
 
-    in List.fold_left fct gr (lsports lassoc)
-
-
+(* ajoute tous les arcs au graph *)
 let add_arcs lassoc lnodes gr =
-  let fct g node =
+  let add g node =
     if List.mem_assoc node lassoc
       then add_people_arcs node lassoc lnodes (new_arc g {src = 0; tgt = (index node lnodes); lbl = 1}) (*1 = nb de personnes acceptées par sport*)
       else new_arc g {src = (index node lnodes); tgt = ((List.length lnodes)+1); lbl = 1} (*1 = nb de personnes acceptées par sport*)
-    in List.fold_left fct gr lnodes
+    in List.fold_left add gr lnodes
 
+(* créer le graph *)
 let create_graph lassoc = 
   let lnodes = create_lnodes lassoc in
   add_arcs lassoc lnodes (add_nodes lnodes)
 
-
+(* applique ford_fulkerson sur le graph *)
 let ford_sports gr =
   let length acu n = 
     if n > acu then n else acu
   in ford_fulkerson gr 0 (n_fold gr length 0)
 
+  (* retourne l'élément de l présent à l'index ind *)
 let get_element ind l =
   let rec loop n = function
     |x::rest -> if (n=ind) then x else loop (n+1) rest
     |[] -> failwith "L'élément est censé exister dans la liste"
   in loop 1 l
 
+(* convertit le graph en une liste d'associations du type (personne,sport attribué) *)
 let graph2assoc gr lassoc lnodes =
 
-  let fct asl node = 
+  let check_node asl node = 
     if List.mem_assoc node lassoc then asl 
     else 
-
-      let fct2 assoclist arc = 
+      let check_out_arc_sport assoclist arc = 
       if (arc.tgt = ((List.length lnodes)+1)) then assoclist 
       else (get_element arc.tgt lnodes, node)::assoclist
-    
-    in List.fold_left fct2 asl (out_arcs gr (index node lnodes)) 
+    in List.fold_left check_out_arc_sport asl (out_arcs gr (index node lnodes)) 
+  in List.fold_left check_node [] lnodes
 
-
-  in List.fold_left fct [] lnodes
-
+(* associe chaque personne à un sport parmi sa liste de préférences *)
 let solution lassoc = 
   let lnodes = create_lnodes lassoc in
   graph2assoc (ford_sports (create_graph lassoc)) lassoc lnodes

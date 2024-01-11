@@ -5,12 +5,12 @@ open Graph
 let clone_nodes (gr:'a graph) = 
   n_fold gr new_node empty_graph
 
-
+(* applique une fonction sur tous les arcs d'un graph *)
 let gmap (gr:'a graph) f = 
   let new_arc_bis gr_bis arc = new_arc gr_bis {arc with lbl = (f arc.lbl)} in
   e_fold gr new_arc_bis (clone_nodes gr)
-;;
 
+(* ajoute un arc au graph g*)
 let add_arc g id1 id2 n =
   match (find_arc g id1 id2) with
     |None -> new_arc g {src = id1 ; tgt = id2 ; lbl = n}

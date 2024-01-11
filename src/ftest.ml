@@ -106,10 +106,7 @@ let f (p,s) = "["^p^" : "^s^"]" in
   Printf.printf "\n******************************ATTRIBUTION DES SPORTS****************************** \n%s\n%!" (list2s "\n" f gr)
 
 
-
 (*TODO : 
-  - reprendre les tests
-  - passer le nombre de sports associés à chaque personne et le nombre de personnes max par sport en paramètres
   - commenter le code*)
 
 

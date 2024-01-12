@@ -56,3 +56,19 @@ let debit_total gr iddest =
     |[] -> deb
     |a::rest -> find_debit (deb + a.lbl) rest
 in find_debit 0 (out_arcs gr iddest)
+
+
+let graphe_flot_final gr_init gr_ecart = 
+  let add_arcs g arc = 
+    let aller = 
+      match (find_arc gr_ecart arc.src arc.tgt) with
+        |Some x -> x.lbl
+        |None ->  0
+    and retour =
+      match (find_arc gr_ecart arc.tgt arc.src) with
+        |Some x -> x.lbl
+        |None -> 0
+    in new_arc g {arc with lbl = ((string_of_int retour)^"/"^(string_of_int (aller+retour)))}
+
+
+  in e_fold gr_init add_arcs (clone_nodes gr_init)

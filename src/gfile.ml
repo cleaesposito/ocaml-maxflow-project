@@ -123,7 +123,7 @@ let export path graph =  (* Open a write-file. *)
   rankdir=LR;\n";
 
   (* Write all nodes (with fake coordinates) *)
-  e_iter graph (fun arc -> fprintf ff "%d -> %d [label = %s];\n" arc.src arc.tgt arc.lbl);
+  e_iter graph (fun arc -> fprintf ff "%d -> %d [label = \"%s\"];\n" arc.src arc.tgt arc.lbl);
   
   fprintf ff "}";
 

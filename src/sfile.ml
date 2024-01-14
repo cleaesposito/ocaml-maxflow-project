@@ -90,11 +90,11 @@ let create_graph lassoc =
   let lnodes = create_lnodes lassoc in
   add_arcs lassoc lnodes (add_nodes lnodes)
 
-(* applique ford_fulkerson sur le graph *)
+(* calcule le graphe d'écart du graphe de départ *)
 let ford_sports gr =
   let length acu n = 
     if n > acu then n else acu
-  in ford_fulkerson gr 0 (n_fold gr length 0)
+  in graphe_ecart_final gr 0 (n_fold gr length 0)
 
   (* retourne l'élément de l présent à l'index ind *)
 let get_element ind l =

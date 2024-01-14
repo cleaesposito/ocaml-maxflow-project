@@ -30,7 +30,7 @@ in vflot gr Int.max_int lnodes
 
 
 (* change le flot des arcs du chemin trouvé *)
-let update_graph_flot gr flot chemin = 
+let update_graphe_ecart gr flot chemin = 
   let rec change_arcs f lnodes g arc = 
     match lnodes with 
       |x::y::rest -> if (x == arc.src && y == arc.tgt) 
@@ -44,10 +44,10 @@ let update_graph_flot gr flot chemin =
 (*tant qu'il existe un chemin dans le graphe de flots, continuer --> fonction principale de l'algo*)
 
 (* update_graph_flot jusqu'à ce qu'il n'y ait plus de chemin entre la source et la destination *)
-let rec ford_fulkerson gr src dest = 
+let rec graphe_ecart_final gr src dest = 
   match (find_chemin gr src dest) with
     |None -> gr
-    |Some ch -> ford_fulkerson (update_graph_flot gr (var_flot gr ch) ch) src dest
+    |Some ch -> graphe_ecart_final (update_graphe_ecart gr (var_flot gr ch) ch) src dest
 
 
 (* retourne le débit total du graph gr *)
@@ -58,6 +58,7 @@ let debit_total gr iddest =
 in find_debit 0 (out_arcs gr iddest)
 
 
+(* retourne le graphe de flot final*)
 let graphe_flot_final gr_init gr_ecart = 
   let add_arcs g arc = 
     let aller = 
@@ -69,6 +70,4 @@ let graphe_flot_final gr_init gr_ecart =
         |Some x -> x.lbl
         |None -> 0
     in new_arc g {arc with lbl = ((string_of_int retour)^"/"^(string_of_int (aller+retour)))}
-
-
   in e_fold gr_init add_arcs (clone_nodes gr_init)

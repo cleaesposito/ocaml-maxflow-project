@@ -60,7 +60,7 @@ let () =
     |None -> Printf.printf "Pas de chemin trouvé %!"
   in*)  
   
-(*TESTS UPDATE_GRAPHE_FLOTS
+(*TESTS UPDATE_GRAPHE_ECART
   let () = 
       let gr = (gmap graph int_of_string) in
         let c = find_chemin gr 9 12 in
@@ -68,22 +68,22 @@ let () =
         |Some a ->  Printf.printf "%s%!\n" (print_list_opt (c)) ; 
                     (let f = var_flot gr a in
                     Printf.printf "Flot du chemin trouvé : %d%!" f;
-                    let g = gmap (update_graph_flot gr f a) string_of_int in
+                    let g = gmap (update_graphe_ecart gr f a) string_of_int in
                       write_file outfile g ;
                       export (outfile ^ ".dot") g) 
         |None -> Printf.printf "Pas de chemin trouvé %!"
   in
 *)
 
-(* TEST FORD_FULKERSON & DEBIT_TOTAL
+(* TEST GRAPHE_ECART_FINAL & DEBIT_TOTAL
 let () = 
-  let gr = gmap (ford_fulkerson (gmap graph int_of_string) 0 5) string_of_int in 
+  let gr = gmap (graphe_ecart_final (gmap graph int_of_string) 0 5) string_of_int in 
     write_file outfile gr ; export (outfile ^ ".dot") gr ; Printf.printf "Débit total = %d\n%!" (debit_total (gmap gr int_of_string) 5) in ()
 *)
 
 (*TEST GRAPHE_FLOT_FINAL*)
 let () = 
-  let gr = graphe_flot_final (gmap graph int_of_string) (ford_fulkerson (gmap graph int_of_string) 0 5)
+  let gr = graphe_flot_final (gmap graph int_of_string) (graphe_ecart_final (gmap graph int_of_string) 0 5)
     in  write_file outfile gr ; export (outfile ^ ".dot") gr 
   in ()
 
